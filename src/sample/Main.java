@@ -51,19 +51,19 @@ public class Main extends Application {
         Map map =null;
         Game game = null;
         BorderPane mainPane = new BorderPane();
-        GridPane gridPane = new GridPane();
-
+        //GridPane gridPane = new GridPane();
+        Custom custom = new Custom();
 
         try {
-             map = new Map(input,gridPane);
+             map = new Map(input,custom);
             game = new Game(map,mainPane);
         } catch (InvalidMapException e) {
             System.out.println(e.getMessage());
             System.exit(0);
         }
 
-        gridPane = map.getPane();
-        mainPane.setCenter(gridPane);
+        custom = map.getPane();
+        mainPane.setCenter(custom);
         game.addPlayer(player);
         mainPane = player.getMainPane();
         Scene scene = new Scene(mainPane,400,400);
@@ -92,7 +92,8 @@ public class Main extends Application {
 class VariousBarrier{
     private Image image;
     private ImageView imageView;
-    VariousBarrier(String wallType){
+    private int blockSize =40;
+    VariousBarrier(String wallType, int i,int j){
         if(wallType.equals("S")){
             this.image = new Image("sample/img/SteelWall.png");
         }else if(wallType.equals("B")){
@@ -105,6 +106,8 @@ class VariousBarrier{
         this.imageView = new ImageView(this.image);
         imageView.setFitHeight(40);
         imageView.setFitWidth(40);
+        imageView.setX(j*blockSize);
+        imageView.setY(i*blockSize);
     }
     public ImageView getImageView(){
         return this.imageView;
@@ -116,11 +119,10 @@ class Bullet{}
 
 class Custom extends Pane{
 
-    public Custom(String fillChar){
+    public Custom(){
         setStyle("-fx-background-color: black;");
-        this.setPrefSize(100,100);
-        VariousBarrier barrier = new VariousBarrier(fillChar);
-        this.getChildren().add(barrier.getImageView());
+
+
 
 
     }
@@ -152,16 +154,17 @@ class Game {
 
 // Map class
 class Map {
-    private Custom[][] custom;
+    private Custom custom;
     private int size;
     private String[][] fill;
-    private GridPane pane;
+   // private GridPane pane;
     private String[] moves;
+    private VariousBarrier barrier;
 
-    public Map(Scanner scanner,GridPane pane) throws InvalidMapException {
+    public Map(Scanner scanner,Custom pane) throws InvalidMapException {
+
+        this.custom = pane;
         this.size = scanner.nextInt();
-        this.custom = new Custom[size][size];
-        this.pane = pane;
         while(scanner.hasNext()) {
             if (size == 0) {
                 throw new InvalidMapException("Map size can not be zero");
@@ -170,7 +173,8 @@ class Map {
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
                     fill[i][j] = scanner.next();
-                    pane.add(custom[i][j] = new Custom(fill[i][j]),j,i);
+                    barrier = new VariousBarrier(fill[i][j],i,j);
+                    custom.getChildren().add(barrier.getImageView());
                     if (!fill[i][j].equals("0") && !fill[i][j].equals("S") && !fill[i][j].equals("P") && !fill[i][j].equals("B") && !fill[i][j].equals("W") && !fill[i][j].equals("T")) {
                         throw new InvalidMapException("Not enough map elements");
                     }
@@ -197,8 +201,8 @@ class Map {
     }
 
 
-    public GridPane getPane() {
-        return this.pane;
+    public Custom getPane() {
+        return this.custom;
     }
 }
 
