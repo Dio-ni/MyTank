@@ -103,23 +103,23 @@ class VariousBarrier{
         if(wallType.equals("S")){
             this.image = new Image("sample/img/SteelWall.png");
             rect.setFill(new ImagePattern(image, 0,0,1,1,true));
-            rect.setX(j*blockSize);
-            rect.setY(i*blockSize);
+            rect.setTranslateX(j*blockSize);
+            rect.setTranslateY(i*blockSize);
         }else if(wallType.equals("B")){
             this.image = new Image("sample/img/BrickWall.png");
             rect.setFill(new ImagePattern(image, 0,0,1,1,true));
-            rect.setX(j*blockSize);
-            rect.setY(i*blockSize);
+            rect.setTranslateX(j*blockSize);
+            rect.setTranslateY(i*blockSize);
         }else if(wallType.equals("W")){
             this.image = new Image("sample/img/Water.png");
             rect.setFill(new ImagePattern(image, 0,0,1,1,true));
-            rect.setX(j*blockSize);
-            rect.setY(i*blockSize);
+            rect.setTranslateX(j*blockSize);
+            rect.setTranslateY(i*blockSize);
         }else if(wallType.equals("T")){
             this.image = new Image("sample/img/Trees.png");
             rect.setFill(new ImagePattern(image, 0,0,1,1,true));
-            rect.setX(j*blockSize);
-            rect.setY(i*blockSize);
+            rect.setTranslateX(j*blockSize);
+            rect.setTranslateY(i*blockSize);
         }
 
 
@@ -173,7 +173,7 @@ class Map {
    // private GridPane pane;
     private String[] moves;
     private VariousBarrier barrier;
-    private ArrayList<Rectangle> walls= new ArrayList<>();
+    public static ArrayList<Rectangle> walls= new ArrayList<>();
 
     public Map(Scanner scanner,Custom pane) throws InvalidMapException {
 
@@ -302,14 +302,31 @@ class MyPlayer implements Player {
     }
     @Override
     public void moveRight() {
+        boolean movingRight = 3 > 0;
 
-        if (rectangle.getTranslateX()<(map.getSize()-1)*blockSize ) {
-
+        for (int i = 0; i < Math.abs(3); i++) {
+            for (Node wall :  map.walls) {
+                System.out.println(wall.getBoundsInParent());
+                if (rectangle.getBoundsInParent().intersects(wall.getBoundsInParent())) {
+                    if (movingRight) {
+                        if (rectangle.getTranslateX() + 40 == wall.getTranslateX()) {
+                            return;
+                        }
+                    }
+                    else {
+                        if (rectangle.getTranslateX() == wall.getTranslateX() + 60) {
+                            return;
+                        }
+                    }
+                }
+            }
+            rectangle.setTranslateX(rectangle.getTranslateX() + (movingRight ? 1 : -1));
         }
     }
 
     @Override
     public void moveLeft() {
+
         if (rectangle.getTranslateX()>0){
             int nextX = (int)((rectangle.getTranslateX()-step-3)/blockSize);
             int nextY =(int)(rectangle.getTranslateY()/blockSize);
